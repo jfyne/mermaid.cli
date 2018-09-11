@@ -106,9 +106,24 @@ backgroundColor = backgroundColor || 'white';
     window.mermaid.init(undefined, container)
   }, definition, mermaidConfig, myCSS)
 
+  let filetype = 'svg';
+  if (output.endsWith('png')) {
+    filetype = 'png';
+  } else if (output.endsWith('pdf')) {
+    filetype = 'pdf';
+  }
+
+  if (/^\.(?:svg|png|pdf)$/.test(output)) {
+    output = undefined;
+  }
+
   if (output.endsWith('svg')) {
     const svg = await page.$eval('#container', container => container.innerHTML)
-    fs.writeFileSync(output, svg)
+    if (output) {
+      fs.writeFileSync(output, svg)
+    } else {
+      process.stdout.write(svg);
+    }
   } else if (output.endsWith('png')) {
     const clip = await page.$eval('svg', svg => {
       const react = svg.getBoundingClientRect()
